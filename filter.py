@@ -1,5 +1,7 @@
+from dateutil import parser
 from urllib.request import urlopen
 import datetime
+import pytz
 import sys
 import xml.etree.ElementTree as ET
 
@@ -21,11 +23,14 @@ def filter_ovt(outfile):
         for subitem in item.getiterator():
             if subitem.tag == 'title':
                 if 'e uur' in subitem.text:
-                    date_list = item.find('pubDate').text.split()
-                    date = datetime.datetime.strptime(
-                        '{} {} {}'.format(date_list[1], date_list[2],
-                                          date_list[3]), '%d %b %Y')
+                    date = parser.parse(item.find('pubDate').text)
                     if '1e uur' in subitem.text:
+                        # Make the first hour a bit newer
+                        # to have it appear above the second.
+                        date += datetime.timedelta(hours=1)
+                        date_record = item.find('pubDate')
+                        date_record.text = date.strftime(
+                            '%a, %d %b %Y %H:%M:%S GMT')
                         new_items.append((date, 1, item))
                     elif '2e uur' in subitem.text:
                         new_items.append((date, 2, item))
@@ -35,7 +40,6 @@ def filter_ovt(outfile):
     new_items.sort(key=lambda e: (e[0], -e[1]), reverse=True)
 
     for new_item in new_items:
-        print(new_item)
         channel.append(new_item[2])
     # We want the '2e uur' to appear below the '1e uur'
 
