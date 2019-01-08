@@ -5,9 +5,8 @@ name = "pypi"
 
 [packages]
 Flask = "*"
-dateutil = "*"
+python-dateutil = "*"
 gevent = "*"
-pytz = "*"
 
 [dev-packages]
 

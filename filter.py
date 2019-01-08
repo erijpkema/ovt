@@ -1,7 +1,6 @@
 from dateutil import parser
 from urllib.request import urlopen
 import datetime
-import pytz
 import sys
 import xml.etree.ElementTree as ET
 
